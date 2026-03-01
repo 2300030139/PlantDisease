@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plant Disease Detection System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #d4fc79, #96e6a1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            width: 800px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #2e7d32;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #1b5e20;
+            transform: scale(1.05);
+        }
+
+        .result-card {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 12px;
+            background: #f1f8f4;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            text-align: left;
+        }
+
+        .result-card h2 {
+            color: #1b5e20;
+        }
+
+        .info {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        img {
+            margin-top: 20px;
+            width: 300px;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .confidence-bar {
+            background: #ddd;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .confidence-fill {
+            height: 15px;
+            background: #4caf50;
+        }
+
+        .loss-fill {
+            height: 15px;
+            background: #e53935;
+        }
+
+        .recovery-fill {
+            height: 15px;
+            background: #1b5e20;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🌿 Plant Disease Detection System</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <br>
+        <button type="submit">🔍 Predict Disease</button>
+    </form>
+
+    {% if prediction %}
+    <div class="result-card">
+        <h2>🦠 {{ prediction }}</h2>
+
+        <div class="info">
+            <strong>Confidence:</strong> {{ confidence }}%
+            <div class="confidence-bar">
+                <div class="confidence-fill" style="width: {{ confidence }}%;"></div>
+            </div>
+        </div>
+
+        <div class="info">
+            <strong>🔎 Cause:</strong>
+            <p>{{ cause }}</p>
+        </div>
+
+        <div class="info">
+            <strong>💊 Treatment:</strong>
+            <p>{{ treatment }}</p>
+        </div>
+
+        <div class="info">
+            <strong>📉 Estimated Yield Loss:</strong> {{ yield_loss }}%
+            <div class="confidence-bar">
+                <div class="loss-fill" style="width: {{ yield_loss }}%;"></div>
+            </div>
+        </div>
+
+        <div class="info">
+            <strong>📈 Expected Recovery:</strong> {{ recovery }}%
+            <div class="confidence-bar">
+                <div class="recovery-fill" style="width: {{ recovery }}%;"></div>
+            </div>
+        </div>
+
+        <!-- 🌿 Organic vs Chemical Selector -->
+        <div class="info">
+            <h3>🌿 Organic vs 🧪 Chemical Treatment</h3>
+
+            <select onchange="showTreatment(this.value)" style="padding:8px;">
+                <option value="">Select Treatment Type</option>
+                <option value="organic">Organic Treatment</option>
+                <option value="chemical">Chemical Treatment</option>
+                <option value="both">Compare Both</option>
+            </select>
+
+            <div id="treatmentBox" style="margin-top:15px;"></div>
+        </div>
+
+        <img src="{{ image_path }}">
+
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+function showTreatment(type) {
+    let box = document.getElementById("treatmentBox");
+
+    let organic = "{{ treatments.organic }}";
+    let chemical = "{{ treatments.chemical }}";
+    let cost = "{{ treatments.cost }}";
+    let eco = "{{ treatments.eco }}";
+
+    if (type === "organic") {
+        box.innerHTML = `
+            <p><b>🌿 Organic Treatment:</b> ${organic}</p>
+            <p><b>💰 Cost:</b> ${cost.split('|')[0]}</p>
+            <p><b>🌍 Environmental Impact:</b> ${eco.split('|')[0]}</p>
+        `;
+    }
+    else if (type === "chemical") {
+        box.innerHTML = `
+            <p><b>🧪 Chemical Treatment:</b> ${chemical}</p>
+            <p><b>💰 Cost:</b> ${cost.split('|')[1]}</p>
+            <p><b>🌍 Environmental Impact:</b> ${eco.split('|')[1]}</p>
+        `;
+    }
+    else if (type === "both") {
+        box.innerHTML = `
+            <p><b>🌿 Organic:</b> ${organic}</p>
+            <p><b>🧪 Chemical:</b> ${chemical}</p>
+            <p><b>💰 Cost:</b> ${cost}</p>
+            <p><b>🌍 Environmental Impact:</b> ${eco}</p>
+        `;
+    }
+    else {
+        box.innerHTML = "";
+    }
+}
+</script>
+
+</body>
+</html>
